@@ -33,7 +33,7 @@ df = df[['Adj. Close', 'HL_PCT', 'PCT_change', 'Adj. Volume',]]
 # add forecast_col to dataframe
 forecast_col = 'Adj. Close'
 df.fillna(value = -99999, inplace = True)       # if na, fill it with -99999, to make na as outlined data
-percent_ahead = 1./1000                         # Try to predict percent_ahead of total dataframe
+percent_ahead = 1./100.                         # Try to predict percent_ahead of total dataframe
 forecast_out = int(math.ceil(percent_ahead * len(df))) 
 
 label = 'Price in ' + str(forecast_out)
