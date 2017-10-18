@@ -61,6 +61,7 @@ df.dropna(inplace=True)
 # Let X be input data (features), and y as output (labels)
 # and convert to numpy array so that skelearn can handel the data
 X = np.array(df.drop([label], 1))
+X = preprocessing.scale(X)
 y = np.array(df[label])
 
 # split data to tranning session and cross_validation session
@@ -73,7 +74,6 @@ clf.fit(X_train, y_train)
 confidence = clf.score(X_test, y_test)
 print('LinearRegression: %f' % confidence)
 
-'''
 #to use Support Vector Regression from Scikit-Learn's svm package:
 for k in ['linear','poly','rbf','sigmoid']:
     print(k)
@@ -81,4 +81,3 @@ for k in ['linear','poly','rbf','sigmoid']:
     clf.fit(X_train, y_train)
     confidence = clf.score(X_test, y_test)
     print(k,confidence)
-'''    
