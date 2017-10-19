@@ -71,11 +71,9 @@ y = np.array(df[label])
 y = y[:-forecast_out]
 
 #iloc loc get local datetime ?
-df['Forecast'] = np.nan
 last_date = df.iloc[-1].name
 last_unix = last_date.timestamp()
 one_day = 86400
-next_unix = last_unix + one_day
 
 # using pickle openning trained classifications:
 #to use Support Vector Regression from Scikit-Learn's svm package:
@@ -92,6 +90,8 @@ for k in ['LinearRegression','svm_linear','smv_poly','svm_rbf','svm_sigmoid']:
         forecast_set = clf.predict(X_lately)      # using X_lately to predict forecast
         print('I predict stock price in %d days using %s' % (forecast_out,k), forecast_set)
 
+        df['Forecast'] = np.nan
+        next_unix = last_unix + one_day
         for i in forecast_set:
             next_date = datetime.datetime.fromtimestamp(next_unix)
             next_unix += 86400
