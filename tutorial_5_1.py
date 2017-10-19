@@ -2,8 +2,8 @@
 """
 Spyder Editor
 
-Tutorial 5
-using pickle and scaling
+Tutorial 5 _ 1
+using pickle open trained file 
 
 https://pythonprogramming.net/pickling-scaling-machine-learning-tutorial/?completed=/forecasting-predicting-machine-learning-tutorial/
 """
@@ -70,55 +70,39 @@ X = X[:-forecast_out]
 y = np.array(df[label])
 y = y[:-forecast_out]
 
-# split data to tranning session and cross_validation session
-X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.2)
 
-
-# using LinearRegression from sklearn:
-clf =  LinearRegression(n_jobs=-1)       # to open n_jobs threads (-1) using all possible threads
-clf.fit(X_train, y_train)
-confidence = clf.score(X_test, y_test)
-print('LinearRegression: %f' % confidence)
-pickle_file = 'LinearRegression' + str(confidence).replace('-','_') + '.pickle'
-# saving classify by using pickle nextime we comment out  training part
-with open(pickle_file, 'wb') as f:
-    pickle.dump(clf, f) 
-
+# using pickle openning trained classifications:
 #to use Support Vector Regression from Scikit-Learn's svm package:
-for k in ['linear','poly','rbf','sigmoid']:
-    print(k)
-    clf = svm.SVR(kernel=k)
-    clf.fit(X_train, y_train)
-    confidence = clf.score(X_test, y_test)
-    print(k,confidence)
-    pickle_file = 'svm_' + k + str(confidence).replace('-','_') + '.pickle'
-    with open(pickle_file, 'wb') as f:
-        pickle.dump(clf, f)
+import glob
+path = '*.pickle'
 
+for k in ['LinearRegression','svm_linear','smv_poly','svm_rbf','svm_sigmoid']:
+    path = k + '*.pickle'
+    for filename in glob.glob(path):
+        pickle_file = filename
+        confidence = filename.replace(k,'').replace('_','-').replace('.pickle','') 
+        print (filename, confidence)
+        pickle_in = open(pickle_file,'rb')
+        clf = pickle.load(pickle_in)
+        forecast_set = clf.predict(X_lately)      # using X_lately to predict forecast
+        print('I predict stock price in %d days using %s' % (forecast_out,k), forecast_set)
 
+        #iloc loc get local datetime ?
+        df['Forecast'] = np.nan
+        last_date = df.iloc[-1].name
+        last_unix = last_date.timestamp()
+        one_day = 86400
+        next_unix = last_unix + one_day
 
-# following part will use pickle open in next app
-'''
-forecast_set = clf.predict(X_lately)      # using X_lately to predict forecast
-print('I predict stock price in %d days' % forecast_out, forecast_set)
-
-#iloc loc get local datetime ?
-df['Forecast'] = np.nan
-last_date = df.iloc[-1].name
-last_unix = last_date.timestamp()
-one_day = 86400
-next_unix = last_unix + one_day
-
-for i in forecast_set:
-    next_date = datetime.datetime.fromtimestamp(next_unix)
-    next_unix += 86400
-    df.loc[next_date] = [np.nan for _ in range(len(df.columns)-1)]+[i]
+        for i in forecast_set:
+            next_date = datetime.datetime.fromtimestamp(next_unix)
+            next_unix += 86400
+            df.loc[next_date] = [np.nan for _ in range(len(df.columns)-1)]+[i]
     
     
-df['Adj. Close'].plot()
-df['Forecast'].plot()
-plt.legend(loc=4)
-plt.xlabel('Date')
-plt.ylabel('Price')
-plt.show()
-'''
+        df['Adj. Close'].plot()
+        df['Forecast'].plot()
+        plt.legend(loc=4)
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.show()
