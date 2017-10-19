@@ -5,7 +5,7 @@ Spyder Editor
 Tutorial 5
 using pickle and scaling
 
-https://pythonprogramming.net/forecasting-predicting-machine-learning-tutorial/?completed=/training-testing-machine-learning-tutorial/
+https://pythonprogramming.net/pickling-scaling-machine-learning-tutorial/?completed=/forecasting-predicting-machine-learning-tutorial/
 """
 import pandas as pd
 import quandl
@@ -79,7 +79,26 @@ clf =  LinearRegression(n_jobs=-1)       # to open n_jobs threads (-1) using all
 clf.fit(X_train, y_train)
 confidence = clf.score(X_test, y_test)
 print('LinearRegression: %f' % confidence)
+pickle_file = 'linearregression' + str(confidence).replace('-','_') + '.pickle'
+# saving classify by using pickle nextime we comment out  training part
+with open(pickle_file, 'wb') as f:
+    pickle.dump(clf, f) 
 
+#to use Support Vector Regression from Scikit-Learn's svm package:
+for k in ['linear','poly','rbf','sigmoid']:
+    print(k)
+    clf = svm.SVR(kernel=k)
+    clf.fit(X_train, y_train)
+    confidence = clf.score(X_test, y_test)
+    print(k,confidence)
+    pickle_file = k + str(confidence).replace('-','_') + '.pickle'
+    with open(pickle_file, 'wb') as f:
+        pickle.dump(clf, f)
+
+
+
+# following part will use pickle open in next app
+'''
 forecast_set = clf.predict(X_lately)      # using X_lately to predict forecast
 print('I predict stock price in %d days' % forecast_out, forecast_set)
 
@@ -102,3 +121,4 @@ plt.legend(loc=4)
 plt.xlabel('Date')
 plt.ylabel('Price')
 plt.show()
+'''
