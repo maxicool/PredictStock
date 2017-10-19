@@ -70,6 +70,12 @@ X = X[:-forecast_out]
 y = np.array(df[label])
 y = y[:-forecast_out]
 
+#iloc loc get local datetime ?
+df['Forecast'] = np.nan
+last_date = df.iloc[-1].name
+last_unix = last_date.timestamp()
+one_day = 86400
+next_unix = last_unix + one_day
 
 # using pickle openning trained classifications:
 #to use Support Vector Regression from Scikit-Learn's svm package:
@@ -78,21 +84,13 @@ path = '*.pickle'
 
 for k in ['LinearRegression','svm_linear','smv_poly','svm_rbf','svm_sigmoid']:
     path = k + '*.pickle'
-    for filename in glob.glob(path):
-        pickle_file = filename
-        confidence = filename.replace(k,'').replace('_','-').replace('.pickle','') 
-        print (filename, confidence)
+    for pickle_file in glob.glob(path):
+        confidence = pickle_file.replace(k,'').replace('_','-').replace('.pickle','') 
+        print (k, confidence)
         pickle_in = open(pickle_file,'rb')
         clf = pickle.load(pickle_in)
         forecast_set = clf.predict(X_lately)      # using X_lately to predict forecast
         print('I predict stock price in %d days using %s' % (forecast_out,k), forecast_set)
-
-        #iloc loc get local datetime ?
-        df['Forecast'] = np.nan
-        last_date = df.iloc[-1].name
-        last_unix = last_date.timestamp()
-        one_day = 86400
-        next_unix = last_unix + one_day
 
         for i in forecast_set:
             next_date = datetime.datetime.fromtimestamp(next_unix)
